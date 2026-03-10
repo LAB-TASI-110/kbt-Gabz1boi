@@ -1,6 +1,6 @@
 #include <stdio.h> // Untuk input/output standar seperti printf dan scanf
 #include <string.h> // Untuk operasi string seperti strcpy
-#include <stdlib.h> // Untuk fungsi umum seperti exit
+#include <stdlib.h> // Untuk fungsi umum
 
 // Struktur untuk menyimpan data tiket
 typedef struct {
@@ -14,6 +14,7 @@ typedef struct {
 } Tiket;
 
 // Fungsi untuk membersihkan buffer input (penting setelah scanf %d)
+// Fungsi ini masih dibutuhkan setelah scanf untuk angka, karena scanf untuk string sekarang lebih canggih.
 void clear_input_buffer() {
     int c;
     while ((c = getchar()) != '\n' && c != EOF);
@@ -32,25 +33,24 @@ int main() {
     printf("  SELAMAT DATANG DI SISTEM TIKET KBT \n");
     printf("===========================================\n\n");
 
-    // 2. Meminta input nama user
+    // 2. Meminta input nama user tanpa fgets
+    // Perhatikan:
+    // - Spasi ' ' sebelum % agar mengabaikan whitespace sebelumnya (misal newline dari input sebelumnya)
+    // - %49[^\n] membaca hingga 49 karakter non-newline (memastikan tidak overflow buffer 50 byte termasuk null terminator)
+    // - %*c membaca dan membuang karakter newline '\n' yang tersisa
     printf("Masukkan Nama Anda: ");
-    fgets(tiket_penumpang.nama, sizeof(tiket_penumpang.nama), stdin);
-    tiket_penumpang.nama[strcspn(tiket_penumpang.nama, "\n")] = 0; // Menghilangkan newline character
+    scanf(" %49[^\n]%*c", tiket_penumpang.nama);
 
-    // 3. Meminta input tujuan
+    // 3. Meminta input tujuan tanpa fgets
     printf("Masukkan Tujuan Perjalanan Anda: ");
-    fgets(tiket_penumpang.tujuan, sizeof(tiket_penumpang.tujuan), stdin);
-    tiket_penumpang.tujuan[strcspn(tiket_penumpang.tujuan, "\n")] = 0; // Menghilangkan newline character
+    scanf(" %49[^\n]%*c", tiket_penumpang.tujuan);
 
-    // 4. Meminta input tanggal dan jam
-    // Menggunakan format sederhana DD-MM-YYYY dan HH:MM
+    // 4. Meminta input tanggal dan jam tanpa fgets
     printf("Masukkan Tanggal Keberangkatan (DD-MM-YYYY): ");
-    fgets(tiket_penumpang.tanggal, sizeof(tiket_penumpang.tanggal), stdin);
-    tiket_penumpang.tanggal[strcspn(tiket_penumpang.tanggal, "\n")] = 0;
+    scanf(" %19[^\n]%*c", tiket_penumpang.tanggal); // 19 untuk buffer 20
 
     printf("Masukkan Jam Keberangkatan (HH:MM): ");
-    fgets(tiket_penumpang.jam, sizeof(tiket_penumpang.jam), stdin);
-    tiket_penumpang.jam[strcspn(tiket_penumpang.jam, "\n")] = 0;
+    scanf(" %9[^\n]%*c", tiket_penumpang.jam); // 9 untuk buffer 10
 
     // 5. Meminta user untuk memilih kelas bus (Executive atau Ekonomi)
     do {
@@ -68,7 +68,7 @@ int main() {
         }
     } while (pilihan_kelas < 1 || pilihan_kelas > 2); // Loop akan terus berjalan selama pilihan tidak valid
 
-    clear_input_buffer(); // Membersihkan buffer setelah scanf
+    clear_input_buffer(); // Membersihkan buffer setelah scanf %d
 
     // Menentukan kelas bus dan harga tiket berdasarkan pilihan
     if (pilihan_kelas == 1) {
@@ -96,7 +96,7 @@ int main() {
         }
     } while (tiket_penumpang.nomor_bangku < 1 || tiket_penumpang.nomor_bangku > bangku_max); // Loop akan terus berjalan selama nomor bangku tidak valid
 
-    clear_input_buffer(); // Membersihkan buffer setelah scanf
+    clear_input_buffer(); // Membersihkan buffer setelah scanf %d
 
     // 7. Menampilkan semua inputan sebagai tiket
     printf("\n===========================================\n");
